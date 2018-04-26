@@ -26,7 +26,8 @@ const result = await retryFunc({maxTries: 3})(func)('arg1, 'arg2', ...)
 
 - type: (options) => wrapFunc
 - options:
-  - maxTries: number = 3
+  - maxTries: Number = 3
+  - shouldRetry: (error) => Boolean - always return true by default
 - wrapFunc:
   - type: (func) => func
 

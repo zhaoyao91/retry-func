@@ -43,4 +43,24 @@ describe('retryFunc', function () {
     }
     expect(runCount).toBe(2)
   })
+
+  it('should fail if should retry return true', async () => {
+    expect.assertions(1)
+
+    let runCount = 0
+
+    function func () {
+      runCount++
+      throw new Error(`error ${runCount}`)
+    }
+
+    try {
+      await retryFunc({
+        maxTries: 5,
+        shouldRetry: (err) => !err.message.endsWith('4')
+      })(func)()
+    } catch (err) {
+      expect(err.message).toBe('error 4')
+    }
+  })
 })

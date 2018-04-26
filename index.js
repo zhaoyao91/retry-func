@@ -1,6 +1,7 @@
 function retryFunc (options = {}) {
   const {
     maxTries = 3,
+    shouldRetry = function () {return true}
   } = options
   return function wrapFunc (func) {
     return async function wrappedFunc (...args) {
@@ -10,7 +11,7 @@ function retryFunc (options = {}) {
         try {
           return await func(...args)
         } catch (err) {
-          if (tries === maxTries) throw err
+          if (tries === maxTries || !shouldRetry(err)) throw err
         }
       }
     }

@@ -1,0 +1,14 @@
+{
+  "name": "retry-func",
+  "version": "0.0.0",
+  "description": "wrap a function to support retry",
+  "main": "index.js",
+  "keywords": [
+    "retry"
+  ],
+  "author": "zhaoyao91 <zhaoyao91@163.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^22.4.3"
+  }
+}

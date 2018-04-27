@@ -12,18 +12,25 @@ function retryFunc (options = {}) {
       while (true) {
         tries++
         beforeTry({tries, args})
+        let success
+        let result
+        let error
+        let willRetry
         try {
-          return await func(...args)
+          result = await func(...args)
+          success = true
+          willRetry = false
         } catch (err) {
+          success = false
           error = err
-          if (tries === maxTries || !shouldRetry(err)) throw err
+          willRetry = tries !== maxTries && shouldRetry(err)
         }
+        afterTry({tries, args, success, result, error, willRetry})
+        if (success) return result
+        else if (!willRetry) throw error
       }
     }
   }
 }
 
 module.exports = retryFunc
-
-// beforeTry ({tries, args})
-// afterTry ({tries, args, success, result, error, willRetry})

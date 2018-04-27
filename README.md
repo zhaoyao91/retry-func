@@ -29,8 +29,15 @@ const result = await retryFunc({maxTries: 3})(func)('arg1, 'arg2', ...)
   - maxTries?: Number = 3
   - shouldRetry?: (error) => Boolean - always return true by default
   - beforeTry?: ({tries, args}) => Void
-    - tries: Number, current try count, from 1
+    - tries: Number - current try count, from 1
     - args: Array
+  - afterTry?: ({tries, args, success, result, error, willRetry}) => Void
+    - tries: Number -  current try count, from 1
+    - args: Array
+    - success: Boolean
+    - result?: Any
+    - error?: Error
+    - willRetry: Boolean
 
 ## License
 

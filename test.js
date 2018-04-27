@@ -64,7 +64,8 @@ describe('retryFunc', function () {
     }
   })
 
-  it('should call before try properly', async () => {
+  it('should call beforeTry properly', async () => {
+    expect.assertions(2)
     const records = []
 
     let runCount = 0
@@ -88,5 +89,60 @@ describe('retryFunc', function () {
     }
 
     expect(records).toEqual([1, [0], 2, [0], 3, [0]])
+  })
+
+  it('should call afterTry properly: success', async () => {
+    const records = []
+
+    let runCount = 0
+
+    function func () {
+      runCount++
+      if (runCount < 2) throw new Error(`${runCount}`)
+      else return runCount
+    }
+
+    function afterTry (arg) {
+      records.push(arg)
+    }
+
+    const result = await retryFunc({
+      maxTries: 3,
+      afterTry
+    })(func)('hello')
+    expect(result).toBe(2)
+    expect(records).toEqual([
+      {tries: 1, args: ['hello'], success: false, error: new Error('1'), willRetry: true},
+      {tries: 2, args: ['hello'], success: true, result: 2, willRetry: false},
+    ])
+  })
+
+  it('should call afterTry properly: not failure', async () => {
+    const records = []
+
+    let runCount = 0
+
+    function func () {
+      runCount++
+      throw new Error(`${runCount}`)
+    }
+
+    function afterTry (arg) {
+      records.push(arg)
+    }
+
+    try {
+      await retryFunc({
+        maxTries: 3,
+        afterTry
+      })(func)('hello')
+    } catch (err) {
+      expect(err.message).toBe('3')
+    }
+    expect(records).toEqual([
+      {tries: 1, args: ['hello'], success: false, error: new Error('1'), willRetry: true},
+      {tries: 2, args: ['hello'], success: false, error: new Error('2'), willRetry: true},
+      {tries: 3, args: ['hello'], success: false, error: new Error('3'), willRetry: false}
+    ])
   })
 })

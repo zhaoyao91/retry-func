@@ -63,4 +63,30 @@ describe('retryFunc', function () {
       expect(err.message).toBe('error 4')
     }
   })
+
+  it('should call before try properly', async () => {
+    const records = []
+
+    let runCount = 0
+
+    function func () {
+      runCount++
+      throw new Error(`${runCount}`)
+    }
+
+    function beforeTry ({tries, args}) {
+      records.push(tries, args)
+    }
+
+    try {
+      await retryFunc({
+        maxTries: 3,
+        beforeTry
+      })(func)(runCount)
+    } catch (err) {
+      expect(err.message).toBe('3')
+    }
+
+    expect(records).toEqual([1, [0], 2, [0], 3, [0]])
+  })
 })
